@@ -1,0 +1,55 @@
+<?php
+/**
+* @file
+* A description of what your module does.
+*/
+
+/**
+ * Implements hook_views_api().
+ */
+function views_accordion_table_views_api(){
+    return array(
+        'api' => 3,
+    );
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function views_accordion_table_preprocess_views_accordion_table(&$vars){
+    template_preprocess_views_view_table($vars); //call views_plugin_style_table preprocess theme callback
+
+    //add style and js
+    drupal_add_css(drupal_get_path('module', 'views_accordion_table') . '/css/style.css');
+    drupal_add_js(drupal_get_path('module', 'views_accordion_table') . '/js/accordian-table.js');
+
+    //add special class
+    foreach($vars['row_classes'] as $key => &$row){
+        $row[] = 'accordion-row-head';
+        $row[] = 'accordion-row-head-'.$key;
+    }
+    unset($row);
+
+    $fields = array_keys($vars['options']['accordion_table']['fields'], 1); //get all key witch have 1 as a value
+    $fields = array_combine($fields,$fields);
+    foreach($fields as $field ) {
+        unset($vars['header'][$field]);
+        unset($vars['header_classes'][$field]);
+    }
+
+    //correct default classes
+    foreach($vars['classes_array'] as &$class)
+    {
+        $tmp = explode('-',$class);
+        if(!empty($tmp) && $tmp[0] == 'cols')
+            $class = $tmp[0].'-'.(intval($tmp[1])-1);
+    }
+    unset($class);
+
+    foreach($vars['rows'] as $key => &$row){
+        $vars['collapsible_rows'][$key] = array_filter(array_intersect_key($row,$fields));
+        foreach($fields as $field => $value )
+            unset($row[$field]);
+    }
+    unset($row);
+}

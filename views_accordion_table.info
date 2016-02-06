@@ -1,0 +1,8 @@
+name = Views Accordion Table
+description = Table style with accordion rows
+core = 7.x
+version = 0.1.0
+package = Views
+dependencies[] = views
+
+files[] = views_accordion_table_plugin_style_accordion_table.inc
